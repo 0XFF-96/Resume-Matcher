@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface LogoutMobileSessionResponse {
-  success: boolean;
+export interface LoginBody {
+  email: string;
+  /** @minLength 6 */
+  password: string;
 }

@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface ExchangeMobileAuthorizationCodeResponse {
-  sessionToken: string;
+export interface RegisterBody {
+  email: string;
+  /** @minLength 6 */
+  password: string;
+  firstName?: string;
+  lastName?: string;
 }

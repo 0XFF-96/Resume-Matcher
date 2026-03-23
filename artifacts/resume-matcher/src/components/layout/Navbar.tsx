@@ -1,16 +1,22 @@
 import { Link, useLocation } from "wouter";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@/context/AuthContext";
 import { Briefcase, FileText, LayoutDashboard, LogOut, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const [location] = useLocation();
-  const { user, isAuthenticated, login, logout, isLoading } = useAuth();
+  const { user, isAuthenticated, openAuthModal, logout, isLoading } = useAuth();
 
   const navItems = [
     { href: "/analyze", label: "Analyze", icon: FileText },
     { href: "/history", label: "History", icon: LayoutDashboard },
   ];
+
+  const displayName = user?.firstName
+    ? `${user.firstName}${user.lastName ? ` ${user.lastName}` : ""}`
+    : user?.email?.split("@")[0] ?? "User";
+
+  const initials = (user?.firstName?.[0] ?? user?.email?.[0] ?? "?").toUpperCase();
 
   return (
     <nav className="fixed top-0 inset-x-0 z-50 h-16 glass-panel border-b border-border/50">
@@ -53,17 +59,9 @@ export function Navbar() {
           ) : isAuthenticated && user ? (
             <div className="flex items-center gap-4">
               <div className="hidden sm:flex items-center gap-3">
-                <span className="text-sm font-medium text-foreground">
-                  {user.firstName ? `${user.firstName} ${user.lastName}` : user.username}
-                </span>
-                <div className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden flex items-center justify-center">
-                  {user.profileImage ? (
-                    <img src={user.profileImage} alt="Avatar" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-xs font-bold text-slate-500">
-                      {(user.firstName?.[0] || user.username?.[0] || '?').toUpperCase()}
-                    </span>
-                  )}
+                <span className="text-sm font-medium text-foreground">{displayName}</span>
+                <div className="w-8 h-8 rounded-full bg-indigo-100 border-2 border-white shadow-sm flex items-center justify-center">
+                  <span className="text-xs font-bold text-primary">{initials}</span>
                 </div>
               </div>
               <button
@@ -76,7 +74,7 @@ export function Navbar() {
             </div>
           ) : (
             <button
-              onClick={login}
+              onClick={openAuthModal}
               className="px-5 py-2 rounded-xl text-sm font-semibold bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
             >
               Log In

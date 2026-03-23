@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth } from "@/context/AuthContext";
 import { Navbar } from "./Navbar";
 
 export function AppLayout({ children }: { children: ReactNode }) {

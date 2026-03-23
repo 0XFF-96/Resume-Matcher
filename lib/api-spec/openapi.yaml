@@ -19,7 +19,6 @@ paths:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -41,70 +40,68 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetCurrentAuthUserResponse"
 
-  /login:
-    get:
-      operationId: login
-      tags: [auth]
-      summary: Initiate OIDC login
-      parameters:
-        - name: returnTo
-          in: query
-          required: false
-          schema:
-            type: string
-      responses:
-        "302":
-          description: Redirect to OIDC provider
-
-  /callback:
-    get:
-      operationId: callback
-      tags: [auth]
-      summary: OIDC callback
-      responses:
-        "302":
-          description: Redirect after authentication
-
-  /logout:
-    get:
-      operationId: logout
-      tags: [auth]
-      summary: Logout
-      responses:
-        "302":
-          description: Redirect after logout
-
-  /mobile-auth/token-exchange:
+  /auth/login:
     post:
-      operationId: exchangeMobileAuthorizationCode
+      operationId: loginUser
       tags: [auth]
-      summary: Exchange mobile authorization code
+      summary: Login with email and password
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ExchangeMobileAuthorizationCodeBody"
+              $ref: "#/components/schemas/LoginBody"
       responses:
         "200":
-          description: Session token
+          description: Login successful
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ExchangeMobileAuthorizationCodeResponse"
+                $ref: "#/components/schemas/AuthSuccessResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
-  /mobile-auth/logout:
+  /auth/register:
     post:
-      operationId: logoutMobileSession
+      operationId: registerUser
       tags: [auth]
-      summary: Mobile logout
+      summary: Register a new user with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
       responses:
-        "200":
-          description: Logout result
+        "201":
+          description: Registration successful
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/LogoutMobileSessionResponse"
+                $ref: "#/components/schemas/AuthSuccessResponse"
+        "409":
+          description: Email already in use
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logoutUser
+      tags: [auth]
+      summary: Logout current user
+      responses:
+        "200":
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogoutResponse"
 
   /analyses:
     get:
@@ -269,50 +266,57 @@ components:
       properties:
         id:
           type: string
+        email:
+          type: string
         firstName:
           type: string
           nullable: true
         lastName:
           type: string
           nullable: true
-        profileImageUrl:
-          type: string
-          nullable: true
-        email:
-          type: string
-          nullable: true
       required:
         - id
+        - email
 
-    ExchangeMobileAuthorizationCodeBody:
+    LoginBody:
       type: object
       properties:
-        code:
+        email:
           type: string
-        state:
+          format: email
+        password:
           type: string
-        codeVerifier:
-          type: string
-        nonce:
-          type: string
-        redirectUri:
-          type: string
+          minLength: 6
       required:
-        - code
-        - state
-        - codeVerifier
-        - nonce
-        - redirectUri
+        - email
+        - password
 
-    ExchangeMobileAuthorizationCodeResponse:
+    RegisterBody:
       type: object
       properties:
-        sessionToken:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        firstName:
+          type: string
+        lastName:
           type: string
       required:
-        - sessionToken
+        - email
+        - password
 
-    LogoutMobileSessionResponse:
+    AuthSuccessResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/AuthUser"
+      required:
+        - user
+
+    LogoutResponse:
       type: object
       properties:
         success:
@@ -341,13 +345,10 @@ components:
       properties:
         jobDescription:
           type: string
-          description: Full job description text
         jobTitle:
           type: string
-          description: Job title for display
         companyName:
           type: string
-          description: Company name
       required:
         - jobDescription
 

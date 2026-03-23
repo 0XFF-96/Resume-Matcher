@@ -5,9 +5,8 @@
  * Resume-JD Matcher API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { AuthUser } from "./authUser";
 
-export interface CreateAnalysisBody {
-  jobDescription: string;
-  jobTitle?: string;
-  companyName?: string;
+export interface AuthSuccessResponse {
+  user: AuthUser;
 }

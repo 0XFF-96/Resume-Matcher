@@ -6,6 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type LoginParams = {
-  returnTo?: string;
-};
+export interface LogoutResponse {
+  success: boolean;
+}

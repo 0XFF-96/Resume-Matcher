@@ -8,7 +8,6 @@
 import * as zod from "zod";
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -24,10 +23,9 @@ export const GetCurrentAuthUserResponse = zod.object({
     .union([
       zod.object({
         id: zod.string(),
+        email: zod.string(),
         firstName: zod.string().nullish(),
         lastName: zod.string().nullish(),
-        profileImageUrl: zod.string().nullish(),
-        email: zod.string().nullish(),
       }),
       zod.null(),
     ])
@@ -35,31 +33,40 @@ export const GetCurrentAuthUserResponse = zod.object({
 });
 
 /**
- * @summary Initiate OIDC login
+ * @summary Login with email and password
  */
-export const LoginQueryParams = zod.object({
-  returnTo: zod.coerce.string().optional(),
+export const loginUserBodyPasswordMin = 6;
+
+export const LoginUserBody = zod.object({
+  email: zod.string().email(),
+  password: zod.string().min(loginUserBodyPasswordMin),
+});
+
+export const LoginUserResponse = zod.object({
+  user: zod.object({
+    id: zod.string(),
+    email: zod.string(),
+    firstName: zod.string().nullish(),
+    lastName: zod.string().nullish(),
+  }),
 });
 
 /**
- * @summary Exchange mobile authorization code
+ * @summary Register a new user with email and password
  */
-export const ExchangeMobileAuthorizationCodeBody = zod.object({
-  code: zod.string(),
-  state: zod.string(),
-  codeVerifier: zod.string(),
-  nonce: zod.string(),
-  redirectUri: zod.string(),
-});
+export const registerUserBodyPasswordMin = 6;
 
-export const ExchangeMobileAuthorizationCodeResponse = zod.object({
-  sessionToken: zod.string(),
+export const RegisterUserBody = zod.object({
+  email: zod.string().email(),
+  password: zod.string().min(registerUserBodyPasswordMin),
+  firstName: zod.string().optional(),
+  lastName: zod.string().optional(),
 });
 
 /**
- * @summary Mobile logout
+ * @summary Logout current user
  */
-export const LogoutMobileSessionResponse = zod.object({
+export const LogoutUserResponse = zod.object({
   success: zod.boolean(),
 });
 
@@ -86,9 +93,9 @@ export const ListAnalysesResponse = zod.object({
  * @summary Create a new analysis (upload resume + JD)
  */
 export const CreateAnalysisBody = zod.object({
-  jobDescription: zod.string().describe("Full job description text"),
-  jobTitle: zod.string().optional().describe("Job title for display"),
-  companyName: zod.string().optional().describe("Company name"),
+  jobDescription: zod.string(),
+  jobTitle: zod.string().optional(),
+  companyName: zod.string().optional(),
 });
 
 /**

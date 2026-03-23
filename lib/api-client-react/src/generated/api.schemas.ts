@@ -11,10 +11,9 @@ export interface HealthStatus {
 
 export interface AuthUser {
   id: string;
+  email: string;
   firstName?: string | null;
   lastName?: string | null;
-  profileImageUrl?: string | null;
-  email?: string | null;
 }
 
 export interface GetCurrentAuthUserResponse {
@@ -22,19 +21,25 @@ export interface GetCurrentAuthUserResponse {
   user?: AuthUser | null;
 }
 
-export interface ExchangeMobileAuthorizationCodeBody {
-  code: string;
-  state: string;
-  codeVerifier: string;
-  nonce: string;
-  redirectUri: string;
+export interface LoginBody {
+  email: string;
+  /** @minLength 6 */
+  password: string;
 }
 
-export interface ExchangeMobileAuthorizationCodeResponse {
-  sessionToken: string;
+export interface RegisterBody {
+  email: string;
+  /** @minLength 6 */
+  password: string;
+  firstName?: string;
+  lastName?: string;
 }
 
-export interface LogoutMobileSessionResponse {
+export interface AuthSuccessResponse {
+  user: AuthUser;
+}
+
+export interface LogoutResponse {
   success: boolean;
 }
 
@@ -47,11 +52,8 @@ export interface DeleteAnalysisResponse {
 }
 
 export interface CreateAnalysisBody {
-  /** Full job description text */
   jobDescription: string;
-  /** Job title for display */
   jobTitle?: string;
-  /** Company name */
   companyName?: string;
 }
 
@@ -168,7 +170,3 @@ export interface AnalysisDetail {
   createdAt: string;
   updatedAt: string;
 }
-
-export type LoginParams = {
-  returnTo?: string;
-};

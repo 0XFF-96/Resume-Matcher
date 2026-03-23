@@ -16,22 +16,20 @@ import type {
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import { useCallback } from "react";
-
 import type {
   AnalysisDetail,
   AnalysisStatusResponse,
   AnalysisSummary,
+  AuthSuccessResponse,
   CreateAnalysisBody,
   DeleteAnalysisResponse,
   ErrorResponse,
-  ExchangeMobileAuthorizationCodeBody,
-  ExchangeMobileAuthorizationCodeResponse,
   GetCurrentAuthUserResponse,
   HealthStatus,
   ListAnalysesResponse,
-  LoginParams,
-  LogoutMobileSessionResponse,
+  LoginBody,
+  LogoutResponse,
+  RegisterBody,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -44,7 +42,6 @@ type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const getHealthCheckUrl = () => {
@@ -195,257 +192,42 @@ export function useGetCurrentAuthUser<
 }
 
 /**
- * @summary Initiate OIDC login
+ * @summary Login with email and password
  */
-export const getLoginUrl = (params?: LoginParams) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0
-    ? `/api/login?${stringifiedParams}`
-    : `/api/login`;
+export const getLoginUserUrl = () => {
+  return `/api/auth/login`;
 };
 
-export const login = async (
-  params?: LoginParams,
+export const loginUser = async (
+  loginBody: LoginBody,
   options?: RequestInit,
-): Promise<unknown> => {
-  return customFetch<unknown>(getLoginUrl(params), {
+): Promise<AuthSuccessResponse> => {
+  return customFetch<AuthSuccessResponse>(getLoginUserUrl(), {
     ...options,
-    method: "GET",
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(loginBody),
   });
 };
 
-export const getLoginQueryKey = (params?: LoginParams) => {
-  return [`/api/login`, ...(params ? [params] : [])] as const;
-};
-
-export const getLoginQueryOptions = <
-  TData = Awaited<ReturnType<typeof login>>,
-  TError = ErrorType<void>,
->(
-  params?: LoginParams,
-  options?: {
-    query?: UseQueryOptions<Awaited<ReturnType<typeof login>>, TError, TData>;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getLoginQueryKey(params);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof login>>> = ({
-    signal,
-  }) => login(params, { signal, ...requestOptions });
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof login>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type LoginQueryResult = NonNullable<Awaited<ReturnType<typeof login>>>;
-export type LoginQueryError = ErrorType<void>;
-
-/**
- * @summary Initiate OIDC login
- */
-
-export function useLogin<
-  TData = Awaited<ReturnType<typeof login>>,
-  TError = ErrorType<void>,
->(
-  params?: LoginParams,
-  options?: {
-    query?: UseQueryOptions<Awaited<ReturnType<typeof login>>, TError, TData>;
-    request?: SecondParameter<typeof customFetch>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getLoginQueryOptions(params, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-/**
- * @summary OIDC callback
- */
-export const getCallbackUrl = () => {
-  return `/api/callback`;
-};
-
-export const callback = async (options?: RequestInit): Promise<unknown> => {
-  return customFetch<unknown>(getCallbackUrl(), {
-    ...options,
-    method: "GET",
-  });
-};
-
-export const getCallbackQueryKey = () => {
-  return [`/api/callback`] as const;
-};
-
-export const getCallbackQueryOptions = <
-  TData = Awaited<ReturnType<typeof callback>>,
-  TError = ErrorType<void>,
->(options?: {
-  query?: UseQueryOptions<Awaited<ReturnType<typeof callback>>, TError, TData>;
-  request?: SecondParameter<typeof customFetch>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getCallbackQueryKey();
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof callback>>> = ({
-    signal,
-  }) => callback({ signal, ...requestOptions });
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof callback>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type CallbackQueryResult = NonNullable<
-  Awaited<ReturnType<typeof callback>>
->;
-export type CallbackQueryError = ErrorType<void>;
-
-/**
- * @summary OIDC callback
- */
-
-export function useCallback<
-  TData = Awaited<ReturnType<typeof callback>>,
-  TError = ErrorType<void>,
->(options?: {
-  query?: UseQueryOptions<Awaited<ReturnType<typeof callback>>, TError, TData>;
-  request?: SecondParameter<typeof customFetch>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getCallbackQueryOptions(options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-/**
- * @summary Logout
- */
-export const getLogoutUrl = () => {
-  return `/api/logout`;
-};
-
-export const logout = async (options?: RequestInit): Promise<unknown> => {
-  return customFetch<unknown>(getLogoutUrl(), {
-    ...options,
-    method: "GET",
-  });
-};
-
-export const getLogoutQueryKey = () => {
-  return [`/api/logout`] as const;
-};
-
-export const getLogoutQueryOptions = <
-  TData = Awaited<ReturnType<typeof logout>>,
-  TError = ErrorType<void>,
->(options?: {
-  query?: UseQueryOptions<Awaited<ReturnType<typeof logout>>, TError, TData>;
-  request?: SecondParameter<typeof customFetch>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getLogoutQueryKey();
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof logout>>> = ({
-    signal,
-  }) => logout({ signal, ...requestOptions });
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof logout>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type LogoutQueryResult = NonNullable<Awaited<ReturnType<typeof logout>>>;
-export type LogoutQueryError = ErrorType<void>;
-
-/**
- * @summary Logout
- */
-
-export function useLogout<
-  TData = Awaited<ReturnType<typeof logout>>,
-  TError = ErrorType<void>,
->(options?: {
-  query?: UseQueryOptions<Awaited<ReturnType<typeof logout>>, TError, TData>;
-  request?: SecondParameter<typeof customFetch>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getLogoutQueryOptions(options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-/**
- * @summary Exchange mobile authorization code
- */
-export const getExchangeMobileAuthorizationCodeUrl = () => {
-  return `/api/mobile-auth/token-exchange`;
-};
-
-export const exchangeMobileAuthorizationCode = async (
-  exchangeMobileAuthorizationCodeBody: ExchangeMobileAuthorizationCodeBody,
-  options?: RequestInit,
-): Promise<ExchangeMobileAuthorizationCodeResponse> => {
-  return customFetch<ExchangeMobileAuthorizationCodeResponse>(
-    getExchangeMobileAuthorizationCodeUrl(),
-    {
-      ...options,
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(exchangeMobileAuthorizationCodeBody),
-    },
-  );
-};
-
-export const getExchangeMobileAuthorizationCodeMutationOptions = <
-  TError = ErrorType<unknown>,
+export const getLoginUserMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof exchangeMobileAuthorizationCode>>,
+    Awaited<ReturnType<typeof loginUser>>,
     TError,
-    { data: BodyType<ExchangeMobileAuthorizationCodeBody> },
+    { data: BodyType<LoginBody> },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof exchangeMobileAuthorizationCode>>,
+  Awaited<ReturnType<typeof loginUser>>,
   TError,
-  { data: BodyType<ExchangeMobileAuthorizationCodeBody> },
+  { data: BodyType<LoginBody> },
   TContext
 > => {
-  const mutationKey = ["exchangeMobileAuthorizationCode"];
+  const mutationKey = ["loginUser"];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
@@ -455,83 +237,166 @@ export const getExchangeMobileAuthorizationCodeMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof exchangeMobileAuthorizationCode>>,
-    { data: BodyType<ExchangeMobileAuthorizationCodeBody> }
+    Awaited<ReturnType<typeof loginUser>>,
+    { data: BodyType<LoginBody> }
   > = (props) => {
     const { data } = props ?? {};
 
-    return exchangeMobileAuthorizationCode(data, requestOptions);
+    return loginUser(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type ExchangeMobileAuthorizationCodeMutationResult = NonNullable<
-  Awaited<ReturnType<typeof exchangeMobileAuthorizationCode>>
+export type LoginUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof loginUser>>
 >;
-export type ExchangeMobileAuthorizationCodeMutationBody =
-  BodyType<ExchangeMobileAuthorizationCodeBody>;
-export type ExchangeMobileAuthorizationCodeMutationError = ErrorType<unknown>;
+export type LoginUserMutationBody = BodyType<LoginBody>;
+export type LoginUserMutationError = ErrorType<ErrorResponse>;
 
 /**
- * @summary Exchange mobile authorization code
+ * @summary Login with email and password
  */
-export const useExchangeMobileAuthorizationCode = <
-  TError = ErrorType<unknown>,
+export const useLoginUser = <
+  TError = ErrorType<ErrorResponse>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof exchangeMobileAuthorizationCode>>,
+    Awaited<ReturnType<typeof loginUser>>,
     TError,
-    { data: BodyType<ExchangeMobileAuthorizationCodeBody> },
+    { data: BodyType<LoginBody> },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationResult<
-  Awaited<ReturnType<typeof exchangeMobileAuthorizationCode>>,
+  Awaited<ReturnType<typeof loginUser>>,
   TError,
-  { data: BodyType<ExchangeMobileAuthorizationCodeBody> },
+  { data: BodyType<LoginBody> },
   TContext
 > => {
-  return useMutation(
-    getExchangeMobileAuthorizationCodeMutationOptions(options),
-  );
+  return useMutation(getLoginUserMutationOptions(options));
 };
 
 /**
- * @summary Mobile logout
+ * @summary Register a new user with email and password
  */
-export const getLogoutMobileSessionUrl = () => {
-  return `/api/mobile-auth/logout`;
+export const getRegisterUserUrl = () => {
+  return `/api/auth/register`;
 };
 
-export const logoutMobileSession = async (
+export const registerUser = async (
+  registerBody: RegisterBody,
   options?: RequestInit,
-): Promise<LogoutMobileSessionResponse> => {
-  return customFetch<LogoutMobileSessionResponse>(getLogoutMobileSessionUrl(), {
+): Promise<AuthSuccessResponse> => {
+  return customFetch<AuthSuccessResponse>(getRegisterUserUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(registerBody),
+  });
+};
+
+export const getRegisterUserMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof registerUser>>,
+    TError,
+    { data: BodyType<RegisterBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof registerUser>>,
+  TError,
+  { data: BodyType<RegisterBody> },
+  TContext
+> => {
+  const mutationKey = ["registerUser"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof registerUser>>,
+    { data: BodyType<RegisterBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return registerUser(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RegisterUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof registerUser>>
+>;
+export type RegisterUserMutationBody = BodyType<RegisterBody>;
+export type RegisterUserMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Register a new user with email and password
+ */
+export const useRegisterUser = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof registerUser>>,
+    TError,
+    { data: BodyType<RegisterBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof registerUser>>,
+  TError,
+  { data: BodyType<RegisterBody> },
+  TContext
+> => {
+  return useMutation(getRegisterUserMutationOptions(options));
+};
+
+/**
+ * @summary Logout current user
+ */
+export const getLogoutUserUrl = () => {
+  return `/api/auth/logout`;
+};
+
+export const logoutUser = async (
+  options?: RequestInit,
+): Promise<LogoutResponse> => {
+  return customFetch<LogoutResponse>(getLogoutUserUrl(), {
     ...options,
     method: "POST",
   });
 };
 
-export const getLogoutMobileSessionMutationOptions = <
+export const getLogoutUserMutationOptions = <
   TError = ErrorType<unknown>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof logoutMobileSession>>,
+    Awaited<ReturnType<typeof logoutUser>>,
     TError,
     void,
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof logoutMobileSession>>,
+  Awaited<ReturnType<typeof logoutUser>>,
   TError,
   void,
   TContext
 > => {
-  const mutationKey = ["logoutMobileSession"];
+  const mutationKey = ["logoutUser"];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
@@ -541,42 +406,42 @@ export const getLogoutMobileSessionMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof logoutMobileSession>>,
+    Awaited<ReturnType<typeof logoutUser>>,
     void
   > = () => {
-    return logoutMobileSession(requestOptions);
+    return logoutUser(requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type LogoutMobileSessionMutationResult = NonNullable<
-  Awaited<ReturnType<typeof logoutMobileSession>>
+export type LogoutUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof logoutUser>>
 >;
 
-export type LogoutMobileSessionMutationError = ErrorType<unknown>;
+export type LogoutUserMutationError = ErrorType<unknown>;
 
 /**
- * @summary Mobile logout
+ * @summary Logout current user
  */
-export const useLogoutMobileSession = <
+export const useLogoutUser = <
   TError = ErrorType<unknown>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof logoutMobileSession>>,
+    Awaited<ReturnType<typeof logoutUser>>,
     TError,
     void,
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationResult<
-  Awaited<ReturnType<typeof logoutMobileSession>>,
+  Awaited<ReturnType<typeof logoutUser>>,
   TError,
   void,
   TContext
 > => {
-  return useMutation(getLogoutMobileSessionMutationOptions(options));
+  return useMutation(getLogoutUserMutationOptions(options));
 };
 
 /**

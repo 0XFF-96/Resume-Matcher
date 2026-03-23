@@ -2,7 +2,8 @@ import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useAuth } from "@workspace/replit-auth-web";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { AuthModal } from "@/components/auth/AuthModal";
 import { AppLayout } from "@/components/layout/AppLayout";
 import NotFound from "@/pages/not-found";
 
@@ -22,7 +23,7 @@ const queryClient = new QueryClient({
 });
 
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, openAuthModal } = useAuth();
   const [, setLocation] = useLocation();
 
   if (isLoading) {
@@ -35,6 +36,7 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
 
   if (!isAuthenticated) {
     setLocation("/");
+    openAuthModal();
     return null;
   }
 
@@ -60,6 +62,7 @@ function Router() {
         </Route>
         <Route component={NotFound} />
       </Switch>
+      <AuthModal />
     </AppLayout>
   );
 }
@@ -68,9 +71,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
+        <AuthProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+        </AuthProvider>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

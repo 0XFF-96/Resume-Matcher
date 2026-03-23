@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { useAuth } from "@workspace/replit-auth-web";
-import { Link, useLocation } from "wouter";
+import { useAuth } from "@/context/AuthContext";
+import { useLocation } from "wouter";
 import { ArrowRight, CheckCircle, FileText, Zap, Shield } from "lucide-react";
 import { useEffect } from "react";
 
 export default function Landing() {
-  const { isAuthenticated, login, isLoading } = useAuth();
+  const { isAuthenticated, openAuthModal, isLoading } = useAuth();
   const [, setLocation] = useLocation();
 
   useEffect(() => {
@@ -27,7 +27,6 @@ export default function Landing() {
     <div className="min-h-screen pt-16 flex flex-col">
       <div className="relative flex-1 flex flex-col items-center justify-center text-center px-4 py-20 overflow-hidden">
         
-        {/* Background Image & Effects */}
         <div className="absolute inset-0 -z-10 bg-slate-50">
           <img 
             src={`${import.meta.env.BASE_URL}images/hero-abstract.png`}
@@ -59,7 +58,7 @@ export default function Landing() {
           
           <div className="pt-8">
             <button
-              onClick={login}
+              onClick={openAuthModal}
               className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-primary text-white font-semibold text-lg shadow-lg shadow-primary/25 hover:-translate-y-1 hover:shadow-xl hover:bg-primary/90 transition-all duration-300"
             >
               Get Started for Free
