@@ -1,2 +1,25 @@
 export * from "./generated/api";
-export * from "./generated/types";
+export type {
+  AnalysisDetail,
+  AnalysisDetailStatus,
+  AnalysisStatusResponse,
+  AnalysisStatusResponseStatus,
+  AnalysisSummary,
+  AnalysisSummaryStatus,
+  AuthSuccessResponse,
+  AuthUser,
+  CreateAnalysisBody,
+  DeleteAnalysisResponse,
+  ErrorResponse,
+  GetCurrentAuthUserResponse,
+  HealthStatus,
+  ListAnalysesResponse,
+  LoginBody,
+  LogoutResponse,
+  MatchGap,
+  MatchGapSeverity,
+  MatchStrength,
+  RecommendationItem,
+  RecommendationItemType,
+  RegisterBody,
+} from "./generated/types";

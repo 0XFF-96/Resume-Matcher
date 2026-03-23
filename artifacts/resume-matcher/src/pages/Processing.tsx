@@ -3,6 +3,7 @@ import { useLocation, useParams } from "wouter";
 import { motion } from "framer-motion";
 import { CheckCircle2, Circle, FileSearch, Loader2, Sparkles } from "lucide-react";
 import { useGetAnalysisStatus } from "@workspace/api-client-react";
+import { cn } from "@/lib/utils";
 
 const STEPS = [
   { id: 0, title: "Extracting Text", desc: "Reading PDF and JD contents" },
@@ -15,10 +16,12 @@ const STEPS = [
 export default function Processing() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
+  const analysisId = Number(id);
 
   // Poll status every 2 seconds
-  const { data, error, isLoading } = useGetAnalysisStatus(Number(id), {
+  const { data, error, isLoading } = useGetAnalysisStatus(analysisId, {
     query: {
+      queryKey: [`/api/analyses/${analysisId}/status`],
       refetchInterval: (query) => {
         // Stop polling if completed or failed
         const status = query.state.data?.status;
@@ -29,13 +32,14 @@ export default function Processing() {
   });
 
   useEffect(() => {
-    if (data?.status === "completed") {
-      // Small delay for smooth transition
-      const timer = setTimeout(() => {
-        setLocation(`/analyses/${id}/results`);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
+    if (data?.status !== "completed") return;
+
+    // Small delay for smooth transition
+    const timer = setTimeout(() => {
+      setLocation(`/analyses/${id}/results`);
+    }, 1000);
+
+    return () => clearTimeout(timer);
   }, [data?.status, id, setLocation]);
 
   if (error || data?.status === "failed") {

@@ -3,7 +3,8 @@ import { useGetAnalysis } from "@workspace/api-client-react";
 import { motion } from "framer-motion";
 import { 
   ArrowLeft, CheckCircle2, AlertTriangle, XCircle, 
-  Target, PenTool, Lightbulb, User, LayoutTemplate
+  Target, PenTool, Lightbulb, User, LayoutTemplate, 
+  Briefcase, Sparkles, ChevronRight
 } from "lucide-react";
 import { MatchScoreRing } from "@/components/ui/MatchScoreRing";
 import { cn } from "@/lib/utils";

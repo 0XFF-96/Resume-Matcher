@@ -160,7 +160,7 @@ export default function Analyze() {
                 <input
                   type="text"
                   value={jobTitle}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e) => setJobTitle(e.target.value)}
                   placeholder="e.g. Senior Frontend Engineer"
                   className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                 />

@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, FileText, ChevronRight, AlertCircle, PlusCircle } from "lucide-react";
+import { Trash2, FileText, ChevronRight, AlertCircle, PlusCircle, Loader2 } from "lucide-react";
 import { useListAnalyses, useDeleteAnalysis } from "@workspace/api-client-react";
 import { MatchScoreRing } from "@/components/ui/MatchScoreRing";
 import { cn } from "@/lib/utils";

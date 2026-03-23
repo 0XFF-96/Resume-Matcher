@@ -54,6 +54,11 @@ WEB_PORT ?= 5173
 dev-api:
 	@echo "==> Starting backend on PORT=$(API_PORT)"
 	@bash -lc 'set -euo pipefail; \
+		if [[ -f "./.env" ]]; then \
+			set -a; \
+			source "./.env"; \
+			set +a; \
+		fi; \
 		export PORT="$(API_PORT)"; \
 		: "${DATABASE_URL:?DATABASE_URL is required}"; \
 		: "${AI_INTEGRATIONS_OPENAI_BASE_URL:?AI_INTEGRATIONS_OPENAI_BASE_URL is required}"; \

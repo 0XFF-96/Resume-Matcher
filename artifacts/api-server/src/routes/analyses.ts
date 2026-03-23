@@ -18,8 +18,11 @@ const WORKFLOW_STEPS = [
   "Generating recommendations",
 ];
 
-async function updateAnalysis(id: number, data: Record<string, unknown>) {
-  await db.update(analysesTable).set({ ...data, updatedAt: new Date() } as Parameters<typeof analysesTable.$inferInsert>[0]).where(eq(analysesTable.id, id));
+async function updateAnalysis(id: number, data: Partial<typeof analysesTable.$inferInsert>) {
+  await db
+    .update(analysesTable)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(analysesTable.id, id));
 }
 
 async function runWorkflow(analysisId: number, resumeText: string, jobDescription: string) {
