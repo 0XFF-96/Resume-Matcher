@@ -1,0 +1,14 @@
+packages:
+  "framer-motion": "For premium page transitions, stagger animations, and layout animations"
+  "clsx": "For conditional class name merging"
+  "tailwind-merge": "For merging tailwind classes safely"
+  "date-fns": "For formatting analysis history dates beautifully"
+
+images:
+  - path: "artifacts/resume-matcher/public/images/hero-abstract.png"
+    description: "A soft, premium abstract gradient mesh background featuring indigo, slate, and very light purple hues, minimalist, SaaS aesthetic, high resolution"
+    aspect_ratio: "16:9"
+
+notes:
+  - "The OpenAPI spec does not include a 'resume' property in the CreateAnalysisBody for multipart/form-data due to an Orval generator limitation. A custom fetch hook (useUploadAnalysis) is required to successfully append the File object."
+  - "Requires standard integration with Replit Auth via @workspace/replit-auth-web."

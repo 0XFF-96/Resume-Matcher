@@ -1,15 +1,18 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Resume-JD Matcher API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: analyses
+    description: Resume-JD match analyses
 paths:
   /healthz:
     get:
@@ -24,6 +27,220 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/user:
+    get:
+      operationId: getCurrentAuthUser
+      tags: [auth]
+      summary: Get current authenticated user
+      responses:
+        "200":
+          description: Current user or unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCurrentAuthUserResponse"
+
+  /login:
+    get:
+      operationId: login
+      tags: [auth]
+      summary: Initiate OIDC login
+      parameters:
+        - name: returnTo
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Redirect to OIDC provider
+
+  /callback:
+    get:
+      operationId: callback
+      tags: [auth]
+      summary: OIDC callback
+      responses:
+        "302":
+          description: Redirect after authentication
+
+  /logout:
+    get:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "302":
+          description: Redirect after logout
+
+  /mobile-auth/token-exchange:
+    post:
+      operationId: exchangeMobileAuthorizationCode
+      tags: [auth]
+      summary: Exchange mobile authorization code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExchangeMobileAuthorizationCodeBody"
+      responses:
+        "200":
+          description: Session token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExchangeMobileAuthorizationCodeResponse"
+
+  /mobile-auth/logout:
+    post:
+      operationId: logoutMobileSession
+      tags: [auth]
+      summary: Mobile logout
+      responses:
+        "200":
+          description: Logout result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogoutMobileSessionResponse"
+
+  /analyses:
+    get:
+      operationId: listAnalyses
+      tags: [analyses]
+      summary: List all analyses for the authenticated user
+      responses:
+        "200":
+          description: List of analyses
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListAnalysesResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    post:
+      operationId: createAnalysis
+      tags: [analyses]
+      summary: Create a new analysis (upload resume + JD)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreateAnalysisBody"
+      responses:
+        "202":
+          description: Analysis created and processing started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisSummary"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analyses/{id}:
+    get:
+      operationId: getAnalysis
+      tags: [analyses]
+      summary: Get a specific analysis by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Full analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      operationId: deleteAnalysis
+      tags: [analyses]
+      summary: Delete an analysis
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteAnalysisResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analyses/{id}/status:
+    get:
+      operationId: getAnalysisStatus
+      tags: [analyses]
+      summary: Get processing status of an analysis
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Processing status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisStatusResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +251,290 @@ components:
       required:
         - status
 
+    GetCurrentAuthUserResponse:
+      type: object
+      properties:
+        authenticated:
+          type: boolean
+        user:
+          nullable: true
+          oneOf:
+            - $ref: "#/components/schemas/AuthUser"
+            - type: "null"
+      required:
+        - authenticated
+
+    AuthUser:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        profileImageUrl:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+      required:
+        - id
+
+    ExchangeMobileAuthorizationCodeBody:
+      type: object
+      properties:
+        code:
+          type: string
+        state:
+          type: string
+        codeVerifier:
+          type: string
+        nonce:
+          type: string
+        redirectUri:
+          type: string
+      required:
+        - code
+        - state
+        - codeVerifier
+        - nonce
+        - redirectUri
+
+    ExchangeMobileAuthorizationCodeResponse:
+      type: object
+      properties:
+        sessionToken:
+          type: string
+      required:
+        - sessionToken
+
+    LogoutMobileSessionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required:
+        - success
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    DeleteAnalysisResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required:
+        - success
+
+    CreateAnalysisBody:
+      type: object
+      properties:
+        jobDescription:
+          type: string
+          description: Full job description text
+        jobTitle:
+          type: string
+          description: Job title for display
+        companyName:
+          type: string
+          description: Company name
+      required:
+        - jobDescription
+
+    AnalysisSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+        jobTitle:
+          type: string
+          nullable: true
+        companyName:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        matchScore:
+          type: integer
+          nullable: true
+        decisionHint:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - userId
+        - status
+        - createdAt
+        - updatedAt
+
+    ListAnalysesResponse:
+      type: object
+      properties:
+        analyses:
+          type: array
+          items:
+            $ref: "#/components/schemas/AnalysisSummary"
+      required:
+        - analyses
+
+    AnalysisStatusResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        currentStep:
+          type: string
+          nullable: true
+        stepIndex:
+          type: integer
+          nullable: true
+        totalSteps:
+          type: integer
+          nullable: true
+        error:
+          type: string
+          nullable: true
+      required:
+        - id
+        - status
+
+    MatchStrength:
+      type: object
+      properties:
+        skill:
+          type: string
+        description:
+          type: string
+      required:
+        - skill
+        - description
+
+    MatchGap:
+      type: object
+      properties:
+        skill:
+          type: string
+        description:
+          type: string
+        severity:
+          type: string
+          enum: [low, medium, high]
+      required:
+        - skill
+        - description
+        - severity
+
+    RecommendationItem:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [resume_rewrite, keyword, interview_prep, pitch]
+        content:
+          type: string
+      required:
+        - type
+        - content
+
+    AnalysisDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: string
+        jobTitle:
+          type: string
+          nullable: true
+        companyName:
+          type: string
+          nullable: true
+        jobDescription:
+          type: string
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        resumeSummary:
+          type: string
+          nullable: true
+        jdSummary:
+          type: string
+          nullable: true
+        matchScore:
+          type: integer
+          nullable: true
+        decisionHint:
+          type: string
+          nullable: true
+        strengths:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchStrength"
+          nullable: true
+        gaps:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchGap"
+          nullable: true
+        missingKeywords:
+          type: array
+          items:
+            type: string
+          nullable: true
+        interviewFocusAreas:
+          type: array
+          items:
+            type: string
+          nullable: true
+        recommendations:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecommendationItem"
+          nullable: true
+        currentStep:
+          type: string
+          nullable: true
+        stepIndex:
+          type: integer
+          nullable: true
+        totalSteps:
+          type: integer
+          nullable: true
+        error:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - userId
+        - jobDescription
+        - status
+        - createdAt
+        - updatedAt

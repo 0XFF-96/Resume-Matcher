@@ -1,0 +1,149 @@
+Create an AI-powered Resume-to-JD Matching Workflow App, a modern document intelligence system built with React + Node.js + LangGraph, designed to transform unstructured documents into structured hiring insights through a clear, automated workflow.
+
+The app should feel intelligent, clean, structured, and purpose-driven — like a professional AI assistant for recruitment and career optimization.
+
+Core Experience:
+At the center of the app is a seamless document workflow that reads a candidate’s PDF resume and a job description, then transforms them into structured insights, match analysis, and actionable recommendations.
+
+The experience should feel fast, clear, and trustworthy — helping users understand fit, gaps, and next steps without cognitive overload.
+
+---
+
+Core Features:
+
+🔐 User Authentication
+- Registration, login, logout
+- Clean, professional onboarding experience
+- Persistent sessions
+- Minimal, enterprise-style UI
+
+📄 Resume Upload & Processing
+- Upload PDF resume
+- Automatic text extraction from document
+- Clean and structured parsing of resume content
+- Handle multi-page documents and noisy formatting gracefully
+
+🧾 Job Description Input
+- Paste or input job description text
+- Support long-form structured or unstructured JD content
+- Prepare JD for AI analysis and matching
+
+🤖 AI Workflow Engine (LangGraph-powered)
+- Multi-step structured workflow:
+  1. Extract resume text
+  2. Parse resume into structured profile
+  3. Parse JD into structured requirements
+  4. Match resume against JD
+  5. Generate recommendations
+- Each step is deterministic, traceable, and modular
+- AI acts as an analysis engine, not a chatbot
+
+🧠 AI Matching Analysis
+- Generate match score
+- Identify strengths and aligned experience
+- Detect gaps and missing qualifications
+- Highlight missing keywords
+- Analyze domain and technical fit
+
+📊 Structured Insights Output
+- Resume summary
+- JD summary
+- Match score (clear visual emphasis)
+- Strengths (aligned skills & experience)
+- Gaps (missing skills / experience)
+- Missing keywords
+- Interview focus areas
+- Decision hint (e.g. strong fit / needs review)
+
+✨ AI Recommendations Engine
+- Resume rewrite suggestions tailored to the JD
+- Bullet point improvements
+- Keyword optimization suggestions
+- Interview preparation guidance
+- Personalized pitch aligned with the role
+
+📚 Insight History / Library
+- Save past analyses and results
+- View previous resume-JD matches
+- Clean card-based history view
+- Allow users to revisit and refine applications
+
+---
+
+Visual Direction:
+Inspired by modern SaaS dashboards combined with the clarity of productivity tools.
+
+- Clean, structured, minimal UI
+- Light gradients and soft surfaces
+- Professional, data-focused layout
+- Clear visual hierarchy
+- Card-based sections
+- Subtle animations for transitions
+- No visual clutter — clarity first
+
+Color Palette:
+- Primary: #4F46E5 (indigo / intelligent tech tone)
+- Secondary: #EEF2FF (light indigo background)
+- Background: #F8FAFC (soft neutral gray)
+- Text: #0F172A (deep slate)
+- Accent: #22C55E (success / positive match)
+- Warning: #F59E0B (gaps / attention)
+
+---
+
+Design Requirements:
+- Build as a responsive web app (desktop-first with mobile support)
+- React + Vite + Tailwind CSS
+- Modular, reusable components
+- Clean layout with clear sections:
+  - Upload & Input
+  - Processing state
+  - Results dashboard
+- Use cards, grids, and structured sections
+- Emphasize readability and clarity over decoration
+- Include loading states and step indicators
+- Show workflow progression (step-by-step analysis)
+
+---
+
+Technical Requirements:
+- Frontend: React + Vite + Tailwind
+- Backend: Node.js + Express
+- Workflow Engine: LangGraph
+- LLM: OpenAI
+- PDF Parsing: Node.js-based PDF loader
+- File Upload: multer
+- Output: strict JSON structure
+
+---
+
+UX Requirements:
+- The system should feel reliable, structured, and explainable
+- Avoid chatbot-style randomness — prioritize workflow clarity
+- Make each step understandable to the user
+- Highlight key insights quickly (score, strengths, gaps)
+- Reduce cognitive load — present insights in digestible sections
+
+---
+
+Pages / Screens:
+- Welcome / Landing
+- Login / Register
+- Upload Resume + Input JD
+- Processing / Workflow State
+- Results Dashboard
+- Insight History / Library
+- Profile / Settings
+
+---
+
+Output:
+Generate a polished, multi-screen application UI and component structure that feels like a professional AI-powered recruitment workflow tool.
+
+The final result should demonstrate:
+- AI-enabled document processing
+- structured workflow thinking
+- clear data transformation
+- actionable insights
+
+The system should feel like an internal tool used by a modern tech company for hiring automation and candidate evaluation.
