@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 interface MatchScoreRingProps {
   score: number;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "hero";
   className?: string;
 }
 
@@ -30,12 +30,14 @@ export function MatchScoreRing({ score, size = "md", className }: MatchScoreRing
     sm: "w-16 h-16",
     md: "w-32 h-32",
     lg: "w-48 h-48",
+    hero: "w-28 h-28 sm:w-36 sm:h-36 lg:w-48 lg:h-48",
   };
 
   const textSizes = {
     sm: "text-lg",
     md: "text-4xl",
     lg: "text-6xl",
+    hero: "text-3xl sm:text-5xl lg:text-6xl",
   };
 
   return (

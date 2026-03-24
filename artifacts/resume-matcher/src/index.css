@@ -53,52 +53,42 @@
 :root {
   --app-font-sans: 'Inter', sans-serif;
   --app-font-display: 'Plus Jakarta Sans', sans-serif;
-  --radius: 0.75rem; 
+  --radius: 0.9rem;
 
-  /* Slate 50 background */
-  --background: 210 40% 98%; 
-  /* Slate 900 foreground */
-  --foreground: 222.2 47.4% 11.2%; 
+  /* Light neutral background */
+  --background: 220 20% 98%;
+  --foreground: 235 30% 14%;
   
-  /* Slate 200 border */
-  --border: 214.3 31.8% 91.4%; 
-  --input: 214.3 31.8% 91.4%; 
-  /* Indigo 600 ring */
-  --ring: 243.4 75.4% 58.6%; 
+  --border: 232 24% 90%;
+  --input: 232 24% 90%;
+  --ring: 248 73% 59%;
 
-  /* White card */
-  --card: 0 0% 100%; 
-  --card-foreground: 222.2 47.4% 11.2%; 
-  --card-border: 214.3 31.8% 91.4%; 
+  --card: 0 0% 100%;
+  --card-foreground: 235 30% 14%;
+  --card-border: 232 24% 90%;
 
-  --popover: 0 0% 100%; 
-  --popover-foreground: 222.2 47.4% 11.2%; 
-  --popover-border: 214.3 31.8% 91.4%; 
+  --popover: 0 0% 100%;
+  --popover-foreground: 235 30% 14%;
+  --popover-border: 232 24% 90%;
 
-  /* Indigo 600 */
-  --primary: 243.4 75.4% 58.6%; 
-  --primary-foreground: 210 40% 98%; 
+  /* PictureWealth-like violet */
+  --primary: 248 73% 59%;
+  --primary-foreground: 0 0% 100%;
 
-  /* Indigo 50 */
-  --secondary: 226.2 100% 96.7%; 
-  --secondary-foreground: 243.4 75.4% 58.6%; 
+  --secondary: 248 100% 97%;
+  --secondary-foreground: 248 73% 45%;
 
-  /* Slate 100 */
-  --muted: 210 40% 96.1%; 
-  /* Slate 500 */
-  --muted-foreground: 215 27.9% 46.9%; 
+  --muted: 225 30% 95%;
+  --muted-foreground: 228 16% 44%;
 
-  /* Green 500 */
-  --accent: 142.1 70.6% 45.3%; 
-  --accent-foreground: 210 40% 98%; 
+  --accent: 152 61% 40%;
+  --accent-foreground: 0 0% 100%;
 
-  /* Red 500 */
-  --destructive: 0 84.2% 60.2%; 
-  --destructive-foreground: 210 40% 98%; 
+  --destructive: 0 78% 57%;
+  --destructive-foreground: 0 0% 100%;
 
-  /* Elevate System */
-  --elevate-1: rgba(0, 0, 0, 0.03);
-  --elevate-2: rgba(0, 0, 0, 0.06);
+  --elevate-1: rgba(15, 23, 42, 0.04);
+  --elevate-2: rgba(15, 23, 42, 0.08);
 }
 
 @layer base {
@@ -116,14 +106,22 @@
 
 @layer utilities {
   .glass-panel {
-    @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl shadow-slate-200/50;
+    @apply bg-white/85 backdrop-blur-xl border border-white/60 shadow-lg shadow-slate-200/70;
   }
   
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-violet-500;
   }
 
   .hover-elevate {
-    @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg;
+    @apply transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg;
+  }
+
+  .pw-section {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .pw-card {
+    @apply rounded-3xl border border-slate-200/70 bg-white shadow-[0_16px_40px_-24px_rgba(15,23,42,0.25)];
   }
 }

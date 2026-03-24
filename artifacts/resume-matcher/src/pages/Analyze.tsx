@@ -79,23 +79,23 @@ export default function Analyze() {
   const isFormValid = file && jobDescription.trim().length > 50;
 
   return (
-    <div className="min-h-screen pt-24 pb-12 bg-slate-50">
+    <div className="min-h-screen pt-20 sm:pt-24 pb-12 sm:pb-14 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.08),transparent_36%),#f8f9ff]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         
-        <div className="mb-10 text-center">
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-slate-900">New Analysis</h1>
-          <p className="mt-3 text-slate-500 text-lg">Upload your resume and the job description to reveal your match score.</p>
+        <div className="mb-7 sm:mb-10 text-center">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-slate-900">New Analysis</h1>
+          <p className="mt-2.5 sm:mt-3 text-slate-500 text-base sm:text-lg">Upload your resume and the job description to reveal your match score.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-8">
           
           {/* Resume Upload Section */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200/60"
+            className="pw-card p-5 sm:p-8"
           >
-            <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2">
               <span className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm">1</span>
               Upload Resume
             </h2>
@@ -112,14 +112,14 @@ export default function Analyze() {
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                   className={cn(
-                    "border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center text-center cursor-pointer transition-colors duration-200",
-                    isDragging ? "border-primary bg-primary/5" : "border-slate-300 hover:border-primary/50 hover:bg-slate-50"
+                    "border-2 border-dashed rounded-2xl p-6 sm:p-10 flex flex-col items-center justify-center text-center cursor-pointer transition-colors duration-200",
+                    isDragging ? "border-primary bg-secondary" : "border-slate-300 hover:border-primary/50 hover:bg-slate-50"
                   )}
                 >
                   <div className="w-16 h-16 mb-4 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
                     <UploadCloud className="w-8 h-8" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-1">Click or drag resume to upload</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1">Click or drag resume to upload</h3>
                   <p className="text-sm text-slate-500">PDF recommended; plain text (.txt) also accepted. Max 10MB.</p>
                   <input
                     type="file"
@@ -136,14 +136,14 @@ export default function Analyze() {
                   key="file-preview"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 flex items-center justify-between"
+                  className="bg-secondary border border-indigo-100 rounded-2xl p-4 sm:p-6 flex items-center justify-between gap-3"
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                     <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-primary">
                       <File className="w-6 h-6" />
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-900">{file.name}</h4>
+                    <div className="min-w-0">
+                      <h4 className="font-semibold text-slate-900 truncate">{file.name}</h4>
                       <p className="text-sm text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                     </div>
                   </div>
@@ -164,14 +164,14 @@ export default function Analyze() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200/60"
+            className="pw-card p-5 sm:p-8"
           >
-            <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2">
               <span className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm">2</span>
               Job Description
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-5 sm:mb-6">
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
                   <Briefcase className="w-4 h-4 text-slate-400" /> Job Title <span className="text-slate-400 font-normal">(Optional)</span>
@@ -223,9 +223,9 @@ export default function Analyze() {
               type="submit"
               disabled={!isFormValid || isPending}
               className={cn(
-                "inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300",
+                "inline-flex items-center gap-3 px-6 sm:px-8 py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg transition-all duration-300",
                 isFormValid && !isPending
-                  ? "bg-primary text-white shadow-lg shadow-primary/25 hover:-translate-y-1 hover:shadow-xl"
+                  ? "bg-primary text-white rounded-full shadow-sm hover:bg-primary/90"
                   : "bg-slate-200 text-slate-400 cursor-not-allowed"
               )}
             >

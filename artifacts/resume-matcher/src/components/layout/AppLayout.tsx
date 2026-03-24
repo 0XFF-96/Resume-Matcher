@@ -14,7 +14,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.05),transparent_32%),#f8f9ff] font-sans text-slate-900">
       <Navbar />
       <main>{children}</main>
     </div>

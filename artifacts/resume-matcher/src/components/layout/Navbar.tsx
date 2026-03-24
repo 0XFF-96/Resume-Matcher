@@ -19,12 +19,12 @@ export function Navbar() {
   const initials = (user?.firstName?.[0] ?? user?.email?.[0] ?? "?").toUpperCase();
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 h-16 glass-panel border-b border-border/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+    <nav className="fixed top-0 inset-x-0 z-50 h-16 bg-white/90 backdrop-blur-md border-b border-slate-200/70">
+      <div className="pw-section h-full flex items-center justify-between">
         
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform">
               <Briefcase className="w-4 h-4" />
             </div>
             <span className="font-display font-bold text-lg text-foreground tracking-tight">
@@ -41,7 +41,7 @@ export function Navbar() {
                   className={cn(
                     "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2",
                     location.startsWith(item.href)
-                      ? "bg-secondary text-secondary-foreground"
+                      ? "bg-secondary text-secondary-foreground shadow-sm"
                       : "text-muted-foreground hover:bg-slate-100 hover:text-foreground"
                   )}
                 >
@@ -75,7 +75,7 @@ export function Navbar() {
           ) : (
             <button
               onClick={openAuthModal}
-              className="px-5 py-2 rounded-xl text-sm font-semibold bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+              className="px-5 py-2 rounded-full text-sm font-semibold bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 transition-colors duration-200"
             >
               Log In
             </button>

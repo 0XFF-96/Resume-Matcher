@@ -21,17 +21,17 @@ export default function History() {
   const analyses = data?.analyses || [];
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen pt-20 sm:pt-24 pb-14 sm:pb-20 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.07),transparent_35%),#f8f9ff]">
+      <div className="pw-section">
         
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6 mb-7 sm:mb-12">
           <div>
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-2">Analysis History</h1>
-            <p className="text-slate-500">Review your past job matches and insights.</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-slate-900 mb-2">Analysis History</h1>
+            <p className="text-sm sm:text-base text-slate-500">Review your past job matches and insights.</p>
           </div>
           <Link 
             href="/analyze"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 hover:shadow-lg transition-all"
+            className="inline-flex w-full sm:w-auto justify-center items-center gap-2 px-6 py-3 rounded-full bg-primary text-white font-medium hover:bg-primary/90 transition-colors"
           >
             <PlusCircle className="w-5 h-5" />
             New Match
@@ -39,21 +39,21 @@ export default function History() {
         </div>
 
         {analyses.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/60 shadow-sm">
+          <div className="pw-card p-7 sm:p-12 text-center">
             <div className="w-20 h-20 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-6">
               <FileText className="w-10 h-10" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">No history yet</h3>
-            <p className="text-slate-500 max-w-md mx-auto mb-8">You haven't run any resume matches yet. Upload your first resume and job description to get started.</p>
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">No history yet</h3>
+            <p className="text-sm sm:text-base text-slate-500 max-w-md mx-auto mb-6 sm:mb-8">You haven't run any resume matches yet. Upload your first resume and job description to get started.</p>
             <Link 
               href="/analyze"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-white font-medium hover:bg-primary/90 transition-colors"
             >
               Analyze Resume
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <AnimatePresence>
               {analyses.map((analysis, idx) => (
                 <motion.div
@@ -62,7 +62,7 @@ export default function History() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ delay: idx * 0.05 }}
-                  className="group bg-white rounded-3xl p-6 border border-slate-200/60 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-300 relative flex flex-col h-full cursor-pointer overflow-hidden"
+                  className="group bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/70 shadow-[0_16px_40px_-24px_rgba(15,23,42,0.3)] hover:shadow-[0_20px_44px_-24px_rgba(15,23,42,0.35)] hover:border-primary/20 transition-all duration-300 relative flex flex-col h-full cursor-pointer overflow-hidden"
                 >
                   <Link href={`/analyses/${analysis.id}/results`} className="absolute inset-0 z-10" />
                   
@@ -103,7 +103,7 @@ export default function History() {
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
-                      <div className="p-2 text-primary bg-primary/5 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
+                      <div className="p-2 text-primary bg-secondary rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
                         <ChevronRight className="w-4 h-4" />
                       </div>
                     </div>
