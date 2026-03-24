@@ -79,6 +79,35 @@ export interface AnalysisSummary {
   updatedAt: string;
 }
 
+export type ResumeExtractionCode =
+  (typeof ResumeExtractionCode)[keyof typeof ResumeExtractionCode];
+
+export const ResumeExtractionCode = {
+  ok: "ok",
+  no_resume_file: "no_resume_file",
+  empty_buffer: "empty_buffer",
+  plain_text_empty: "plain_text_empty",
+  not_pdf_binary: "not_pdf_binary",
+  pdf_no_extractable_text: "pdf_no_extractable_text",
+  pdf_encrypted: "pdf_encrypted",
+  pdf_parse_error: "pdf_parse_error",
+} as const;
+
+/**
+ * Outcome of server-side resume text extraction (multipart upload)
+ */
+export interface ResumeExtraction {
+  /** True when non-empty resume text was obtained */
+  ok: boolean;
+  code: ResumeExtractionCode;
+  /** Human-readable summary for display */
+  message: string;
+}
+
+export type CreateAnalysisAccepted = AnalysisSummary & {
+  resumeExtraction: ResumeExtraction;
+};
+
 export interface ListAnalysesResponse {
   analyses: AnalysisSummary[];
 }

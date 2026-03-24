@@ -26,6 +26,12 @@ if (!basePath) {
   );
 }
 
+/** Local dev: forward browser `/api` (and `BASE_PATH/api`) to the Express api-server */
+const apiProxyTarget =
+  process.env.API_PROXY_TARGET ?? "http://127.0.0.1:3001";
+const normalizedBase = basePath.replace(/\/$/, "");
+const devApiPrefix = normalizedBase ? `${normalizedBase}/api` : "/api";
+
 export default defineConfig({
   base: basePath,
   plugins: [
@@ -65,6 +71,18 @@ export default defineConfig({
     fs: {
       strict: true,
       deny: ["**/.*"],
+    },
+    proxy: {
+      [devApiPrefix]: {
+        target: apiProxyTarget,
+        changeOrigin: true,
+        // Browser calls `/app/api/...` when BASE_PATH is `/app/`; backend only mounts `/api`.
+        rewrite: (path) =>
+          path.replace(
+            new RegExp(`^${normalizedBase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/api`),
+            "/api",
+          ),
+      },
     },
   },
   preview: {

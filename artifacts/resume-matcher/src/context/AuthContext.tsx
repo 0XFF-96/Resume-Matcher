@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { withAppBase } from "@/lib/api-base";
 
 export interface AuthUser {
   id: string;
@@ -22,11 +23,34 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | null>(null);
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
-
 async function fetchJson(url: string, options?: RequestInit) {
   const res = await fetch(url, { credentials: "include", ...options });
-  return { ok: res.ok, status: res.status, data: await res.json() };
+  const text = await res.text();
+  let data: Record<string, unknown> = {};
+
+  if (text.trim()) {
+    try {
+      data = JSON.parse(text) as Record<string, unknown>;
+    } catch {
+      data = {
+        error: `Server returned non-JSON (HTTP ${res.status}): ${text.slice(0, 200)}`,
+      };
+    }
+  } else {
+    data = {
+      error:
+        res.status === 404
+          ? "API not reachable (empty response). In local dev: run `make dev-api` in another terminal so the backend is on port 3001; Vite proxies /api to it."
+          : `Empty response from server (HTTP ${res.status})`,
+    };
+  }
+
+  return { ok: res.ok, status: res.status, data };
+}
+
+function apiErrorMessage(data: Record<string, unknown>, fallback: string): string {
+  const e = data.error;
+  return typeof e === "string" && e.length > 0 ? e : fallback;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -39,8 +63,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (isFetching.current) return;
     isFetching.current = true;
     try {
-      const { data } = await fetchJson(`${BASE}/api/auth/user`);
-      setUser(data.authenticated ? data.user : null);
+      const { data } = await fetchJson(withAppBase("/api/auth/user"));
+      setUser(
+        data.authenticated === true && data.user != null
+          ? (data.user as AuthUser)
+          : null,
+      );
     } catch {
       setUser(null);
     } finally {
@@ -54,29 +82,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refetchUser]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const { ok, data } = await fetchJson(`${BASE}/api/auth/login`, {
+    const { ok, data } = await fetchJson(withAppBase("/api/auth/login"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    if (!ok) throw new Error(data.error || "Login failed");
-    setUser(data.user);
+    if (!ok) throw new Error(apiErrorMessage(data, "Login failed"));
+    setUser(data.user as AuthUser);
     setIsAuthModalOpen(false);
   }, []);
 
   const register = useCallback(async (email: string, password: string, firstName?: string) => {
-    const { ok, data } = await fetchJson(`${BASE}/api/auth/register`, {
+    const { ok, data } = await fetchJson(withAppBase("/api/auth/register"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, firstName }),
     });
-    if (!ok) throw new Error(data.error || "Registration failed");
-    setUser(data.user);
+    if (!ok) throw new Error(apiErrorMessage(data, "Registration failed"));
+    setUser(data.user as AuthUser);
     setIsAuthModalOpen(false);
   }, []);
 
   const logout = useCallback(async () => {
-    await fetchJson(`${BASE}/api/auth/logout`, { method: "POST" });
+    await fetchJson(withAppBase("/api/auth/logout"), { method: "POST" });
     setUser(null);
   }, []);
 

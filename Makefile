@@ -70,9 +70,10 @@ dev-web:
 	@bash -lc 'set -euo pipefail; \
 		export PORT="$(WEB_PORT)"; \
 		export BASE_PATH="$(BASE_PATH)"; \
+		export API_PROXY_TARGET="http://127.0.0.1:$(API_PORT)"; \
 		pnpm --filter @workspace/resume-matcher dev'
 
 dev:
 	@echo "Run these in two terminals:"
 	@echo "  1) make dev-api"
-	@echo "  2) make dev-web"
+	@echo "  2) make dev-web  (Vite proxies /api -> http://127.0.0.1:$(API_PORT))"

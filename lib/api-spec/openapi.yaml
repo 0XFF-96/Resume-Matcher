@@ -138,7 +138,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AnalysisSummary"
+                $ref: "#/components/schemas/CreateAnalysisAccepted"
         "401":
           description: Unauthorized
           content:
@@ -329,6 +329,9 @@ components:
       properties:
         error:
           type: string
+        code:
+          type: string
+          description: Stable machine-readable error code when available
       required:
         - error
 
@@ -386,6 +389,38 @@ components:
         - status
         - createdAt
         - updatedAt
+
+    ResumeExtraction:
+      type: object
+      description: Outcome of server-side resume text extraction (multipart upload)
+      required: [ok, code, message]
+      properties:
+        ok:
+          type: boolean
+          description: True when non-empty resume text was obtained
+        code:
+          type: string
+          enum:
+            - ok
+            - no_resume_file
+            - empty_buffer
+            - plain_text_empty
+            - not_pdf_binary
+            - pdf_no_extractable_text
+            - pdf_encrypted
+            - pdf_parse_error
+        message:
+          type: string
+          description: Human-readable summary for display
+
+    CreateAnalysisAccepted:
+      allOf:
+        - $ref: "#/components/schemas/AnalysisSummary"
+        - type: object
+          properties:
+            resumeExtraction:
+              $ref: "#/components/schemas/ResumeExtraction"
+          required: [resumeExtraction]
 
     ListAnalysesResponse:
       type: object

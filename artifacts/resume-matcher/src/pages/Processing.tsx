@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useParams } from "wouter";
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, FileSearch, Loader2, Sparkles } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Circle, FileSearch, Loader2, Sparkles, X } from "lucide-react";
 import { useGetAnalysisStatus } from "@workspace/api-client-react";
+import { RESUME_EXTRACTION_STORAGE_PREFIX } from "@/lib/resume-extraction";
 import { cn } from "@/lib/utils";
 
 const STEPS = [
@@ -17,6 +18,21 @@ export default function Processing() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
   const analysisId = Number(id);
+  const [resumeWarning, setResumeWarning] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!Number.isFinite(analysisId)) return;
+    const key = `${RESUME_EXTRACTION_STORAGE_PREFIX}${analysisId}`;
+    try {
+      const msg = sessionStorage.getItem(key);
+      if (msg) {
+        setResumeWarning(msg);
+        sessionStorage.removeItem(key);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [analysisId]);
 
   // Poll status every 2 seconds
   const { data, error, isLoading } = useGetAnalysisStatus(analysisId, {
@@ -72,6 +88,23 @@ export default function Processing() {
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-2xl bg-white rounded-[2rem] p-10 shadow-xl shadow-slate-200/50 border border-slate-100"
       >
+        {resumeWarning ? (
+          <div
+            role="alert"
+            className="mb-8 flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-left text-sm text-amber-950"
+          >
+            <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" aria-hidden />
+            <p className="min-w-0 flex-1 leading-relaxed">{resumeWarning}</p>
+            <button
+              type="button"
+              onClick={() => setResumeWarning(null)}
+              className="shrink-0 rounded-lg p-1 text-amber-700 hover:bg-amber-100"
+              aria-label="Dismiss resume notice"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        ) : null}
         <div className="flex flex-col items-center text-center mb-12">
           <div className="relative mb-6">
             <div className="w-20 h-20 bg-indigo-50 rounded-2xl flex items-center justify-center text-primary animate-pulse">

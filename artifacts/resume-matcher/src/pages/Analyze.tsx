@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { UploadCloud, File, X, ChevronRight, Briefcase, Building2, AlignLeft, Loader2 } from "lucide-react";
 import { useUploadAnalysis } from "@/hooks/use-upload";
+import { RESUME_EXTRACTION_STORAGE_PREFIX, shouldAlertResumeExtraction } from "@/lib/resume-extraction";
 import { cn } from "@/lib/utils";
 
 export default function Analyze() {
@@ -36,10 +37,18 @@ export default function Analyze() {
   };
 
   const handleFileSelection = (selectedFile: File) => {
-    if (selectedFile.type === "application/pdf") {
+    const name = selectedFile.name.toLowerCase();
+    const okType =
+      selectedFile.type === "application/pdf" ||
+      selectedFile.type === "text/plain" ||
+      selectedFile.type === "text/markdown" ||
+      name.endsWith(".pdf") ||
+      name.endsWith(".txt") ||
+      name.endsWith(".md");
+    if (okType) {
       setFile(selectedFile);
     } else {
-      alert("Please upload a PDF file.");
+      alert("Please upload a PDF or plain text resume (.txt / .md).");
     }
   };
 
@@ -51,8 +60,18 @@ export default function Analyze() {
       { resume: file, jobDescription, jobTitle, companyName },
       {
         onSuccess: (data) => {
+          if (shouldAlertResumeExtraction(data.resumeExtraction.code)) {
+            try {
+              sessionStorage.setItem(
+                `${RESUME_EXTRACTION_STORAGE_PREFIX}${data.id}`,
+                data.resumeExtraction.message,
+              );
+            } catch {
+              /* private mode / quota */
+            }
+          }
           setLocation(`/analyses/${data.id}/processing`);
-        }
+        },
       }
     );
   };
@@ -100,11 +119,11 @@ export default function Analyze() {
                   <div className="w-16 h-16 mb-4 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
                     <UploadCloud className="w-8 h-8" />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-1">Click or drag PDF to upload</h3>
-                  <p className="text-sm text-slate-500">Max file size 5MB. PDF format only.</p>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-1">Click or drag resume to upload</h3>
+                  <p className="text-sm text-slate-500">PDF recommended; plain text (.txt) also accepted. Max 10MB.</p>
                   <input
                     type="file"
-                    accept=".pdf,application/pdf"
+                    accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown"
                     className="hidden"
                     ref={fileInputRef}
                     onChange={(e) => {

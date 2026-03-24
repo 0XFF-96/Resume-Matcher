@@ -19,8 +19,8 @@ import type {
 import type {
   AnalysisDetail,
   AnalysisStatusResponse,
-  AnalysisSummary,
   AuthSuccessResponse,
+  CreateAnalysisAccepted,
   CreateAnalysisBody,
   DeleteAnalysisResponse,
   ErrorResponse,
@@ -529,7 +529,7 @@ export const getCreateAnalysisUrl = () => {
 export const createAnalysis = async (
   createAnalysisBody: CreateAnalysisBody,
   options?: RequestInit,
-): Promise<AnalysisSummary> => {
+): Promise<CreateAnalysisAccepted> => {
   const formData = new FormData();
   formData.append(`jobDescription`, createAnalysisBody.jobDescription);
   if (createAnalysisBody.jobTitle !== undefined) {
@@ -539,7 +539,7 @@ export const createAnalysis = async (
     formData.append(`companyName`, createAnalysisBody.companyName);
   }
 
-  return customFetch<AnalysisSummary>(getCreateAnalysisUrl(), {
+  return customFetch<CreateAnalysisAccepted>(getCreateAnalysisUrl(), {
     ...options,
     method: "POST",
     body: formData,

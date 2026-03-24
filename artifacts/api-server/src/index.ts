@@ -48,6 +48,15 @@ function loadDotEnvIfPresent(envPath: string): void {
 const repoRoot = fileURLToPath(new URL("../../../", import.meta.url));
 loadDotEnvIfPresent(path.join(repoRoot, ".env"));
 
+process.on("unhandledRejection", (reason) => {
+  logger.error({ reason }, "Unhandled promise rejection");
+});
+
+process.on("uncaughtException", (err) => {
+  logger.error({ err }, "Uncaught exception");
+  process.exit(1);
+});
+
 const rawPort = process.env["PORT"];
 
 if (!rawPort) {
